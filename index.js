@@ -181,9 +181,17 @@ Object.defineProperties(logger, {
         }
     },
 
+    warnings: {
+        writable: true
+    },
+
+    errors: {
+        writable: true
+    },
+
     _err: {
         value: function () {
-            return !this.errors.length;
+            return !!this.errors.length;
         }  
     },
 
