@@ -1,0 +1,26 @@
+{
+  "name": "argv-parser",
+  "version": "0.1.0",
+  "description": "> A much better node.js commander solution for sub commands.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/kaelzhang/argv-parser.git"
+  },
+  "keywords": [
+    "argv",
+    "parser",
+    "argument-vector",
+    "cleaner",
+    "simple"
+  ],
+  "author": "Kael",
+  "license": "MIT",
+  "readmeFilename": "README.md",
+  "bugs": {
+    "url": "https://github.com/kaelzhang/argv-parser/issues"
+  }
+}
