@@ -166,8 +166,8 @@ var logger = {
         this.errors.push(data);
     },
 
-    stop: function () {
-        this.stopped = true;
+    info: function (data) {
+        this.infos.push(data);
     }
 };
 
