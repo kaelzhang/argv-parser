@@ -110,6 +110,7 @@ parser._parse_argv = function(argv, rules, offset) {
 };
 
 
+// Apply `rule.value`
 parser._ = function(args, defaults) {
     defaults = defaults || {};
 
@@ -137,7 +138,8 @@ parser._ = function(args, defaults) {
 
             logger._get(key, ret);
 
-            if(logger._isStopped()){
+            if(logger._err()){
+                ret.err = true;
                 break;
             }
 
@@ -149,6 +151,10 @@ parser._ = function(args, defaults) {
 
     return ret;
 };
+
+function is_empty_object (object) {
+    return !Object.keys(object).length;
+}
 
 
 var logger = {
@@ -175,9 +181,9 @@ Object.defineProperties(logger, {
         }
     },
 
-    _isStopped: {
+    _err: {
         value: function () {
-            return this.stopped;
+            return !this.errors.length;
         }  
     },
 
