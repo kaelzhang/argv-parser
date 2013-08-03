@@ -120,7 +120,7 @@ parser._ = function(args, defaults) {
     var ret = {
         warnings: {},
         errors: {},
-        // logs: {},
+        logs: {},
         parsed: args
     };
 
@@ -177,7 +177,7 @@ Object.defineProperties(logger, {
         value: function () {
             this.warnings = [];
             this.errors = [];
-            // this.logs = [];
+            this.logs = [];
         }
     },
 
@@ -186,6 +186,10 @@ Object.defineProperties(logger, {
     },
 
     errors: {
+        writable: true
+    },
+
+    logs: {
         writable: true
     },
 
@@ -199,7 +203,7 @@ Object.defineProperties(logger, {
         value: function (key, host) {
             this._(key, 'warnings', host);
             this._(key, 'errors', host);
-            // this._(key, 'logs', host);
+            this._(key, 'logs', host);
         }
     },
 
