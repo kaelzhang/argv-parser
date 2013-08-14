@@ -21,6 +21,7 @@ parser.PARSE_ARGV_OFFSET = 2;
 
 // @param {Object} options
 // - rules: {Object}
+// - offset: {Object} the offset argv-parser start to parse
 parser.parse = function(argv, options) {
     var parsed_rules = parser._parse_rules(options.rules);
     var parsed = parser._parse_argv(argv, parsed_rules, options.offset || parser.PARSE_ARGV_OFFSET);
@@ -41,6 +42,22 @@ parser.clean = function(data, options) {
 };
 
 
+function mix (receiver, supplier, override){
+    var key;
+
+    if(arguments.length === 2){
+        override = true;
+    }
+
+    for(key in supplier){
+        if(override || !(key in receiver)){
+            receiver[key] = supplier[key]
+        }
+    }
+
+    return receiver;
+}
+
 // {
 //     String: {
 //         type: String,
@@ -51,8 +68,7 @@ parser.clean = function(data, options) {
 // }
 
 // So that we will not 
-parser.TYPES = Object.create(nopt.typeDefs);
-
+parser.TYPES = mix({}, nopt.typeDefs);
 
 parser.TYPES.html = {
     type: 'html',
@@ -127,14 +143,9 @@ parser._ = function(args, defaults) {
     for(key in defaults){
         santitizer = defaults[key];
 
-        if(santitizer instanceof Function){
+        if(typeof santitizer === 'function'){
             logger._reset();
             args[key] = santitizer(args[key], args, logger);
-            // console.log( require('util').inspect(logger, {
-            //     showHidden: true,
-            //     depth: 10,
-            //     colors: true
-            // }) );
 
             logger._get(key, ret);
 
