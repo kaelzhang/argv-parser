@@ -1,6 +1,6 @@
 {
   "name": "argv-parser",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "description": "Argv-parser is a small and simple node.js module to parser `process.argv`.",
   "main": "index.js",
   "scripts": {
@@ -8,7 +8,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git://github.com/kaelzhang/argv-parser.git"
+    "url": "git@github.com:kaelzhang/node-argv-parser.git"
   },
   "keywords": [
     "argv",
@@ -21,7 +21,7 @@
   "license": "MIT",
   "readmeFilename": "README.md",
   "bugs": {
-    "url": "https://github.com/kaelzhang/argv-parser/issues"
+    "url": "https://github.com/kaelzhang/node-argv-parser/issues"
   },
   "dependencies": {
     "nopt": "~2.1.2"

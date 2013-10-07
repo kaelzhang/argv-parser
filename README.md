@@ -1,6 +1,6 @@
 # Argv-parser
 
-> Argv-parser is a small and simple node.js module to parser `process.argv`
+> Argv-parser is a small and simple node.js module to parse `process.argv`
 
 Argv-parser is designed to be simple and will do nothing about:
 
