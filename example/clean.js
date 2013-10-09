@@ -14,7 +14,7 @@ function remote_check_username (value, callback) {
 
     // Ha, this is a pointless async method
     process.nextTick(function(){
-        callback('Username already taken!!');
+        callback( value === 'guest' ? null : 'Username already taken!!');
     });
 }
 
@@ -55,10 +55,6 @@ var c = clean({
                 remote_check_username(value, function(err){
                     done(err);
                 });
-            },
-
-            setter: function (value) {
-                return md5(value);
             }
         },
 
@@ -71,7 +67,7 @@ var c = clean({
                 // guests are welcome without passwords
                 if ( value || username === 'guest' ) {
                     // define a new 
-                    done(null, '123456');
+                    done(null, md5(value || '123456'));
 
                 } else {
                     done('Please input your password, or use "guest" account instead.');
@@ -103,14 +99,14 @@ c.clean({
     password: ''
 
 }, function(err, results, details){
-    console.log('clean a given object:');
+    console.log('\n\nclean a given object:');
 
     print_result(err, results, details);
 });
 
 
 c.parseArgv(process.argv, function(err, results, details){
-    console.log('parse the current argv:');
+    console.log('\n\nparse the current argv:');
 
     print_result(err, results, details);
 })
