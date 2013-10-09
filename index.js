@@ -95,8 +95,11 @@ Clean.prototype._parseSchema = function(schema) {
         //     cwd: 'abc'
         // }
         if ( rule.short ) {
-            shorthands[rule.short] = rule.short_pattern ?
-                minimist(rule.short_pattern) :
+            var pattern = rule.short_pattern;
+            shorthands[rule.short] = pattern ?
+                Object(pattern) === pattern ?
+                    pattern :
+                    minimist(rule.short_pattern) :
                 name;
         }
 
