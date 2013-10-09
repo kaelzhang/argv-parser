@@ -18,14 +18,19 @@ function clean (schema, options) {
 
 
 // @param {schema} schema
-// @param {}  
+// @param {Object} options
+// - offset: {Number} the offset of the argv at which we should begin to parse  
 function Clean (schema, options) {
-    this._parseSchema(schema);
+    this.options = options = options || {};
 
-    this.options = options || {};
+    if ( typeof options.offset !== 'number' ) {
+        options.offset = clean.PARSE_ARGV_OFFSET;
+    }
+
     this._types = {};
 
-    this.checker = checker(this._clean_schema, this.options);
+    this._parseSchema(schema);
+    this.checker = checker(this._schema, this.options);
 }
 
 
@@ -76,7 +81,7 @@ Clean.prototype.registerType = function (type, schema) {
 //     required: {boolean}
 // }
 Clean.prototype._parseSchema = function(schema) {
-    var clean_schema = checker.parseSchema(schema);
+    schema = checker.parseSchema(schema);
     var shorthands = {};
 
     util.map(schema, function (rule, name) {
@@ -96,24 +101,25 @@ Clean.prototype._parseSchema = function(schema) {
         }
 
         if ( rule.required ) {
-            clean_schema.validator.unshift(required_validator);
+            rule.validator.unshift(required_validator);
         }
 
         var type = rule.type;
+
         var type_def = this._getTypeDef(type);
 
         if ( type_def.validator ) {
-            clean_schema.validator.unshift(type_def.validator);
+            rule.validator.unshift(type_def.validator);
         }
 
         if ( type_def.setter ) {
-            clean_schema.setter.unshift(type_def.setter);
+            rule.setter.unshift(type_def.setter);
         }
 
     }, this);
 
     this._shorthands = shorthands;
-    this._schema = clean_schema;
+    this._schema = schema;
 };
 
 
@@ -141,7 +147,7 @@ Clean.prototype._getTypeDef = function(type) {
 
 
 Clean.prototype._applyShorthands = function(data) {
-    util.map(this._shorthands, function (shorthand, def) {
+    util.map(this._shorthands, function (def, shorthand) {
         if ( shorthand in data ) {
             var origin_value = data[shorthand];
             delete data[shorthand];
