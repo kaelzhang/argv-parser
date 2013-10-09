@@ -12,15 +12,15 @@ var node_url    = require('url');
 var node_stream = require('stream');
 
 
-function clean (schema, options) {
-    return new Clean(schema, options);
+function clean (options) {
+    return new Clean(options);
 }
 
 
 // @param {schema} schema
 // @param {Object} options
 // - offset: {Number} the offset of the argv at which we should begin to parse  
-function Clean (schema, options) {
+function Clean (options) {
     this.options = options = options || {};
 
     if ( typeof options.offset !== 'number' ) {
@@ -29,7 +29,8 @@ function Clean (schema, options) {
 
     this._types = {};
 
-    this._parseSchema(schema);
+    this._parseSchema();
+    this._parseShorthands();
     this.checker = checker(this._schema, this.options);
 }
 
@@ -80,28 +81,10 @@ Clean.prototype.registerType = function (type, schema) {
 //     setter: {function()}
 //     required: {boolean}
 // }
-Clean.prototype._parseSchema = function(schema) {
-    schema = checker.parseSchema(schema);
-    var shorthands = {};
+Clean.prototype._parseSchema = function() {
+    var schema = checker.parseSchema(this.options.schema);
 
     util.map(schema, function (rule, name) {
-
-        // {
-        //     short: 'c',
-        //     short_pattern: ['--cwd', 'abc']
-        // }
-        // -> 
-        // c: {
-        //     cwd: 'abc'
-        // }
-        if ( rule.short ) {
-            var pattern = rule.short_pattern;
-            shorthands[rule.short] = pattern ?
-                Object(pattern) === pattern ?
-                    pattern :
-                    minimist(rule.short_pattern) :
-                name;
-        }
 
         if ( rule.required ) {
             rule.validator.unshift(required_validator);
@@ -121,8 +104,22 @@ Clean.prototype._parseSchema = function(schema) {
 
     }, this);
 
-    this._shorthands = shorthands;
     this._schema = schema;
+};
+
+
+Clean.prototype._parseShorthands = function() {
+    var shorthands = {};
+
+    util.map(this.options.shorthands || {}, function (def, shorthand) {
+        shorthands[shorthand] = typeof def === 'string' ?
+            def :
+            Object(def) === def ?
+                def :
+                minimist(def);
+    });
+
+    this._shorthands = shorthands;
 };
 
 

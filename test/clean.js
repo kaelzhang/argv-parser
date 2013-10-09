@@ -10,7 +10,6 @@ var node_url = require('url');
 
 var schema = {
     cwd: {
-        short: 'c',
         type: node_path
     },
 
@@ -21,11 +20,19 @@ var schema = {
     url: {
         type: node_url
     }
+};
+
+var shorthands = {
+    'c': 'cwd'
 }
 
 describe(".parse()", function(){
     it("complex", function(done){
-        clean(schema).parseArgv(['node', 'my command', '-c', 'abc', '-a', '--url', 'abc'], function(err, results, details){
+        clean({
+            schema: schema,
+            shorthands: shorthands
+
+        }).parseArgv(['node', 'my command', '-c', 'abc', '-a', '--url', 'abc'], function(err, results, details){
             done();
             expect(err).not.to.equal(null);
             expect(results.cwd).to.equal(node_path.resolve('abc'));
