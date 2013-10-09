@@ -1,14 +1,14 @@
 {
-  "name": "argv-parser",
+  "name": "clean",
   "version": "1.1.0",
-  "description": "Argv-parser is a small and powerful node.js module to parser `process.argv`.",
+  "description": "clean parses and santitize argv or options for node, supporting fully extendable types, shorthands, validatiors and setters.",
   "main": "index.js",
   "scripts": {
     "test": "make test"
   },
   "repository": {
     "type": "git",
-    "url": "git@github.com:kaelzhang/node-argv-parser.git"
+    "url": "git@github.com:kaelzhang/node-clean.git"
   },
   "keywords": [
     "argv",
@@ -21,11 +21,11 @@
   "license": "MIT",
   "readmeFilename": "README.md",
   "bugs": {
-    "url": "https://github.com/kaelzhang/node-argv-parser/issues"
+    "url": "https://github.com/kaelzhang/node-clean/issues"
   },
   "dependencies": {
-    "nopt": "~2.1.2",
-    "checker": "~0.4.2"
+    "checker": "~0.5.1",
+    "minimist": "~0.0.5"
   },
   "devDependencies": {
     "mocha": "~1.13.0",
