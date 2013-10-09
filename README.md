@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/kaelzhang/node-argv-parser.png?branch=master)](https://travis-ci.org/kaelzhang/node-argv-parser)
+[![Build Status](https://travis-ci.org/kaelzhang/node-clean.png?branch=master)](https://travis-ci.org/kaelzhang/node-clean)
 
 # Argv-parser
 
