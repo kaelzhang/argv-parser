@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/kaelzhang/node-argv-parser.png?branch=master)](https://travis-ci.org/kaelzhang/node-argv-parser)
+
 # Argv-parser
 
 > Argv-parser is a small and simple node.js module to parse `process.argv`
