@@ -1,36 +1,28 @@
 [![Build Status](https://travis-ci.org/kaelzhang/node-clean.png?branch=master)](https://travis-ci.org/kaelzhang/node-clean)
 
-# Argv-parser
+# clean
 
-> Argv-parser is a small and simple node.js module to parse `process.argv`
+Clean is small but powerful node.js module that parses and santitize argv or options for node, supporting:
 
-Argv-parser is designed to be simple and will do nothing about:
+- fully extendable types
+- shorthands
+- validatiors
+- setters
 
-- option registration
-- description of options
-- output
-
-## Installation
+# Installation
 
 ```sh
-npm install argv-parser --save
+npm install clean --save
 ```
 
-## Usage
+# Programatical Details
 
 ```js
-var parser = require('argv-parser');
+var clean = require('clean')(schema, options);
 ```
 
-## parser.parse(argv, options)
-
-Parse argument vector (argv) or something like argv.
 
 ##### Returns `ret` `Object`
-
-- parsed: `Object` the parsed object
-- warnings: `Object` the warnings of each option. If not exists, `ret.warning` will be an empty object
-- errors: `Object` the errors of each option.
 
 ##### argv `Array`
 
@@ -42,16 +34,28 @@ Parse argument vector (argv) or something like argv.
 - offset: `Number` (optional, default to `2`) the offset from which the parser should start to parse.
 
 
-## parser.clean(data, options)
+## .argv(argv)
 
-##### Returns
+Parses the argument vector
 
-The same as `parser.parse`
 
-##### options `Object`
+## .clean(data, callback)
 
-- rules: `Object`
-- types: `Object` (optional) type definitions. For most cases, you needn't this option
+Cleans the given data according to the `schema`.
+
+
+## .parseArgv(argv, callback)
+
+Parses argument vector (argv) or something like argv, and cleans the parsed data according to the `schema`.
+
+This method is equivalent to `c.clean(c.argv(argv), callback)`.
+
+
+#### data `Object`
+
+The given data.
+
+#### callback `function(err, results, details)`
 
 
 ## options.rules
@@ -97,41 +101,6 @@ var rules = {
         type: String
     }
 };
-
-var data = parser.parse(process.argv, {
-	rules: rules
-});
-```
-
-Default values:
-
-```
-$ node test.js
-> data.parsed.open; // true
-> data.parsed.port; // 9230
-
-```
-
-Type limitation:
-
-```
-$ node test.js --port 8888 --no-open --name name<script>alert(123)</script>
-> data.parsed.open; // false
-> data.parsed.port; // 8888
-> data.parsed.name; // 'namealert(123)'; -> stripped
-> data.errors;      // {}
-> data.warnings;    // {}
-```
-
-Warnings and errors:
-
-```
-$ node test.js --port 888 --no-open --name name<script>alert(123)</script>
-> data.parsed.open; // false
-> data.parsed.port; // undefined; -> error
-> data.parsed.name; // 'name<script>alert(123)</script>'
-> data.errors;      // {port: ['port < 100 which is forbidden']}
-> data.warnings;    // {port: ['port < 8000 which is dangerous']}
 ```
 
 

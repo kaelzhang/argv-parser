@@ -40,7 +40,7 @@ clean.PARSE_ARGV_OFFSET = 2;
 
 
 // parse and clean
-Clean.prototype.parse = function(argv, callback) {
+Clean.prototype.parseArgv = function(argv, callback) {
     var data = this.argv(argv);
 
     this.clean(data, callback);

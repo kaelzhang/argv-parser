@@ -25,12 +25,11 @@ var schema = {
 
 describe(".parse()", function(){
     it("complex", function(done){
-        clean(schema).parse(['node', 'my command', '-c', 'abc', '-a', '--url', 'abc'], function(err, results, details){
+        clean(schema).parseArgv(['node', 'my command', '-c', 'abc', '-a', '--url', 'abc'], function(err, results, details){
             done();
             expect(err).not.to.equal(null);
             expect(results.cwd).to.equal(node_path.resolve('abc'));
             expect(details.url.error).not.to.equal(null);
-            
         });
     });
 });
