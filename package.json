@@ -1,10 +1,10 @@
 {
   "name": "argv-parser",
-  "version": "0.1.5",
-  "description": "Argv-parser is a small and simple node.js module to parser `process.argv`.",
+  "version": "1.1.0",
+  "description": "Argv-parser is a small and powerful node.js module to parser `process.argv`.",
   "main": "index.js",
   "scripts": {
-    "test": "mocha"
+    "test": "make test"
   },
   "repository": {
     "type": "git",
