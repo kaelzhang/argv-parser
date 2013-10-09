@@ -1,17 +1,184 @@
 'use strict';
 
-var parser      = module.exports = {};
+module.exports = clean;
+clean.Clean = Clean;
 
-// var nopt        = require('nopt');
+var minimist    = require('minimist');
 var checker     = require('checker');
+var util        = checker.util;
+
 var node_path   = require('path');
 var node_url    = require('url');
 var node_stream = require('stream');
 
 
+function clean (schema, options) {
+    return new Clean(schema, options);
+}
+
+
+// @param {schema} schema
+// @param {}  
+function Clean (schema, options) {
+    this._parseSchema(schema);
+
+    this.options = options || {};
+    this._types = {};
+
+    this.checker = checker(this._clean_schema, this.options);
+}
+
+
 //  0       1           2          3
 // ['node', __filename, <command>, [options] ]
-parser.PARSE_ARGV_OFFSET = 2;
+clean.PARSE_ARGV_OFFSET = 2;
+
+
+// parse and clean
+Clean.prototype.parse = function(argv, callback) {
+    var data = this.argv(argv);
+
+    this.clean(data, callback);
+};
+
+
+Clean.prototype.argv = function(argv) {
+    var data =  minimist(argv.slice(this.options.offset));
+    this._applyShorthands(data);
+
+    return data;
+};
+
+
+Clean.prototype.clean = function(object, callback) {
+    this.checker.check(object, callback);
+};
+
+
+Clean.prototype.registerType = function (type, schema) {
+    this._types[type] = schema;  
+};
+
+
+// schema
+// <key>: {
+     
+//     // schema for argv >>>>>>>>>>>>>>>>
+//     short: 'c',
+//     // '-c' is equivalent to '--cwd <default-short-value>' 
+//     short_pattern: ['--cwd', '<default-short-value>'],
+
+//     // schema for santitizing >>>>>>>>>>>>>>>>>>
+//     default: process.cwd(),
+//     type: node_path,
+//     validator: {function()
+//     setter: {function()}
+//     required: {boolean}
+// }
+Clean.prototype._parseSchema = function(schema) {
+    var clean_schema = checker.parseSchema(schema);
+    var shorthands = {};
+
+    util.map(schema, function (rule, name) {
+
+        // {
+        //     short: 'c',
+        //     short_pattern: ['--cwd', 'abc']
+        // }
+        // -> 
+        // c: {
+        //     cwd: 'abc'
+        // }
+        if ( rule.short ) {
+            shorthands[rule.short] = rule.short_pattern ?
+                minimist(rule.short_pattern) :
+                name;
+        }
+
+        if ( rule.required ) {
+            clean_schema.validator.unshift(required_validator);
+        }
+
+        var type = rule.type;
+        var type_def = this._getTypeDef(type);
+
+        if ( type_def.validator ) {
+            clean_schema.validator.unshift(type_def.validator);
+        }
+
+        if ( type_def.setter ) {
+            clean_schema.setter.unshift(type_def.setter);
+        }
+
+    }, this);
+
+    this._shorthands = shorthands;
+    this._schema = clean_schema;
+};
+
+
+Clean.prototype._getTypeDef = function(type) {
+    var rule = this._types[type] || TYPES[type];
+
+    // must be an object, or abandon it
+    if ( Object(rule) === rule ) {
+        return rule;
+    }
+
+    var key;
+    var def;
+
+    for (key in TYPES) {
+        def = TYPES[key];
+
+        if ( type === def.type ) {
+            return def;
+        }
+    }
+
+    return {};
+};
+
+
+Clean.prototype._applyShorthands = function(data) {
+    util.map(this._shorthands, function (shorthand, def) {
+        if ( shorthand in data ) {
+            var origin_value = data[shorthand];
+            delete data[shorthand];
+
+            // shorthands: { c: 'cwd' }
+            // data: { c: 'abc' } -> { cwd: 'abc' }
+            if ( typeof def === 'string' ) {
+
+                if ( shorthand  ) {
+                    
+                }
+                data[def] = origin_value;
+
+            // shorthands: { r3: { retry: 3, strict: false } }
+            // data: { r3: true } -> { retry, 3, strict: false }
+            } else {
+                util.mix(data, def);
+            }
+        }
+    });
+};
+
+
+function required_validator (value, is_default) {
+    var done = this.async();
+
+    if ( is_default ) {
+        done({
+            code: 'EREQUIRED',
+            data: {
+                value: value
+            }
+        });
+    } else {
+        done(null);
+    }
+};
 
 
 // Part of the built-in enum types from nopt 
@@ -152,134 +319,6 @@ var TYPES = {
     }
 };
 
-// cwd: {
-//     short: 'c',
-//     // '-c' is equivalent to '--cwd <default-short-value>' 
-//     short_pattern: ['--cwd', '<default-short-value>'],
-
-//     // @type {mixed|function()} default value or generator
-//     // - {function()}
-//     value: process.cwd(),
-//     type: node_path,
-//     required: true
-// }
-
-// @param {Object} options
-// - rules: {Object}
-// - offset: {Object} the offset argv-parser start to parse
-parser.parse = function(argv, options) {
-    var parsed_rules = parser._parse_rules(options.rules);
-    var parsed = parser._parse_argv(argv, parsed_rules, options.offset || parser.PARSE_ARGV_OFFSET);
-
-    return parser._(parsed, parsed_rules.defaults);
-};
-
-
-// Clean the given data object according to the rules
-// @param {Object} options
-// - rules: {Object}
-// - types: {Object} type definitions
-parser.clean = function(data, options) {
-    var parsed_rules = parser._parse_rules(options.rules);
-    nopt.clean(data, parsed_rules.types, options.type_defs || parser.TYPES);
-
-    return parser._(data, parsed_rules.defaults);
-};
-
-
-function mix (receiver, supplier, override){
-    var key;
-
-    if(arguments.length === 2){
-        override = true;
-    }
-
-    for(key in supplier){
-        if(override || !(key in receiver)){
-            receiver[key] = supplier[key]
-        }
-    }
-
-    return receiver;
-}
-
-
-parser._parse_rules = function(rules) {
-    var opt_types = {};
-    var short_hands = {};
-    var default_values = {};
-
-    var opts = Object.keys(rules);
-
-    opts.forEach(function(key) {
-        var option = rules[key];
-
-        opt_types[key] = option.type;
-
-        if(option.short){
-            short_hands[option.short] = option.short_pattern || ('--' + key);
-        }
-
-        // options.value might be unreal
-        if('value' in option){
-            default_values[key] = option.value;
-        }
-    });
-
-    return {
-        types: opt_types,
-        short: short_hands,
-        defaults: default_values,
-        options: opts
-    };
-};
-
-
-// Parse `process.argv` or something like `process.argv` to data object
-parser._parse_argv = function(argv, rules, offset) {
-    return nopt(rules.types, rules.short, argv, offset);
-};
-
-
-// Apply `rule.value`
-parser._ = function(args, defaults) {
-    defaults = defaults || {};
-
-    var key;
-    var santitizer;
-
-    var ret = {
-        warnings: {},
-        errors: {},
-        infos: {},
-        parsed: args
-    };
-
-    for(key in defaults){
-        santitizer = defaults[key];
-
-        if(typeof santitizer === 'function'){
-            logger._reset();
-            args[key] = santitizer(args[key], args, logger);
-
-            logger._get(key, ret);
-
-            if(logger._err()){
-                ret.err = true;
-                break;
-            }
-
-        // default value
-        }else if( !(key in args) ){
-            args[key] = santitizer;
-        }
-    }
-
-    return ret;
-};
-
-function is_empty_object (object) {
-    return !Object.keys(object).length;
-}
+clean.TYPES = TYPES;
 
 
