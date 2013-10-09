@@ -9,39 +9,115 @@ Clean is small but powerful node.js module that parses and santitize argv or opt
 - validatiors
 - setters
 
-# Installation
+# Installation and Usage
 
 ```sh
 npm install clean --save
 ```
 
-# Programatical Details
-
 ```js
 var clean = require('clean')(schema, options);
 ```
 
+# Usage
 
-##### Returns `ret` `Object`
+## Argv Shorthands
 
-##### argv `Array`
+We can define shorthands with the option `options.shorthands`.
 
-`process.argv` or something like that.
+```js
+var shorthands = {
+	// if `String`, define a shorthand for a key name
+	c: 'cwd',
+	// if `Array`, define a pattern slice of argv
+	nr: ['--no-recursive'],
+	// if `Object`, define a specific value
+	r3: {
+		retry: 3,
+		strict: false
+	}
+};
+clean({
+	shorthands: shorthands
+}).argv(['node', 'xxx', '-c', 'abc', '--nr', '--r3']); 
+// notice that '-nr' will be considered as '-n -r'
+// The result is:
+// {
+//		cwd: 'abc',
+//		recursive: false,
+//		retry: 3,
+//		strict: false 
+// }
+```
 
-##### options `Object`
+## Types
 
-- rules: `Object` an extended `nopt` rules
-- offset: `Number` (optional, default to `2`) the offset from which the parser should start to parse.
+```js
+clean({
+	schema: {
+		cwd: {
+			type: require('path')
+		},
+		
+		retry: {
+			type: Boolean
+		}		
+	}
+}).parseArgv(
+	['node', 'xxx', '--cwd', 'abc', 'retry', 'false'], 
+	function(err, results, details){
+		console.log(results.cwd); // the `path.resolved()`d 'abc'
+		console.log(results.retry === false); // is a boolean, not a string
+	}
+)
+```
+
+How to extend a custom type ? See the "advanced section".
+
+## Validators and Setters
+
+Validators and setters of `clean` is implemented by `[checker](https://github.com/kaelzhang/node-checker)`, check the apis of `checker` for details.
+
+You could check out the demo located at "example/clean.js". That is a very complicated situation of usage.
+
+```sh
+node example/clean.js --username guest
+```
+
+
+
+# Programatical Details
+
+## constructor: clean(schema, options)
+
+
+### options
+
+#### options.offset `Number=`
+
+The offset from which the parser should start to parse. Optional. Default to `2`.
 
 
 ## .argv(argv)
 
-Parses the argument vector
+Parses the argument vector.
+
+### argv `Array`
+
+### returns `Object`
+
+The parsed object with shorthand rules applied.
 
 
 ## .clean(data, callback)
 
 Cleans the given data according to the `schema`.
+
+### data `Object`
+
+The given data.
+
+### callback `function(err, results, details)`
 
 
 ## .parseArgv(argv, callback)
@@ -50,58 +126,7 @@ Parses argument vector (argv) or something like argv, and cleans the parsed data
 
 This method is equivalent to `c.clean(c.argv(argv), callback)`.
 
-
-#### data `Object`
-
-The given data.
-
-#### callback `function(err, results, details)`
-
-
-## options.rules
-
-
-## Example
-
-test.js
-
-```js
-var rules = {
-    open: {
-        type: Boolean,
-        value: true
-    },
-
-    port: {
-        type: Number,
-        short: 'p',
-        value: function(port, parsed, tool) {
-            if(!port){
-                port = 9230;
-            }
-
-            if(port < 8000){
-                tool.warn('port < 8000 which is dangerous');
-                
-                if(port < 1000){
-                	tool.error('port < 100 which is forbidden');
-        			return;
-                }
-            }
-
-            return port;
-        }
-    },
-
-    html: {
-        type: 'html',
-    },
-
-    name: {
-        type: String
-    }
-};
-```
+# Advanced Section
 
 
 
