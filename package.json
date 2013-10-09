@@ -24,7 +24,8 @@
     "url": "https://github.com/kaelzhang/node-argv-parser/issues"
   },
   "dependencies": {
-    "nopt": "~2.1.2"
+    "nopt": "~2.1.2",
+    "checker": "~0.4.2"
   },
   "devDependencies": {
     "mocha": "~1.13.0",
