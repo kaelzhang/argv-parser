@@ -16,7 +16,7 @@ npm install clean --save
 ```
 
 ```js
-var clean = require('clean')(schema, options);
+var clean = require('clean')(options);
 ```
 
 # Usage
@@ -97,6 +97,20 @@ node example/clean.js --username guest
 
 The offset from which the parser should start to parse. Optional. Default to `2`.
 
+#### options.shorthands `Object=`
+
+The shorthands used to parse the argv.
+
+#### options.schema `Object=`
+
+The schema used to clean the given object or the parsred argv
+
+#### options.check_all `Boolean=false`
+
+#### options.parallel `Boolean=false`
+
+#### options.limit `Boolean=false`
+
 
 ## .argv(argv)
 
@@ -127,6 +141,8 @@ Parses argument vector (argv) or something like argv, and cleans the parsed data
 This method is equivalent to `c.clean(c.argv(argv), callback)`.
 
 # Advanced Section
+
+## .registerType(type, typeDef)
 
 
 

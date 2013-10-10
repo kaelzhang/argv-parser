@@ -19,7 +19,15 @@ function clean (options) {
 
 // @param {schema} schema
 // @param {Object} options
-// - offset: {Number} the offset of the argv at which we should begin to parse  
+// - offset: {Number} the offset of the argv at which we should begin to parse
+// - schema: {Object}
+// - shorthands: {Object}
+// checker options:
+// - context: {Object} the context of the helper functions
+// - default_message: {string}
+// - parallel: {boolean=false} whether checker should check the properties in parallel, default to false
+// - limit: {boolean=false} limit to the schema
+// - check_all: {boolean=false} by default, checker will exit immediately when the first error is encountered.
 function Clean (options) {
     this.options = options = options || {};
 
