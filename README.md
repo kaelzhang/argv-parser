@@ -114,7 +114,7 @@ The schema used to clean the given object or the parsred argv
 
 ## .argv(argv)
 
-Parses the argument vector.
+Parses the argument vector, without cleaning the data.
 
 ### argv `Array`
 
