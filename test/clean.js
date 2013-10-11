@@ -40,3 +40,25 @@ describe(".parse()", function(){
         });
     });
 });
+
+
+describe(".clean()", function(){
+    it("default value of String should be ''", function(done){
+        clean({
+            schema: {
+                a: {
+                    type: String
+                },
+                b: {
+                    type: String,
+                    default: null
+                }
+            }
+        }).clean({}, function(err, results){
+            done();
+
+            expect(results.a).to.equal('');
+            expect(results.b).to.equal('null');
+        });
+    });
+});

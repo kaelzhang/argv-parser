@@ -223,7 +223,11 @@ function required_validator (value, is_default) {
 var TYPES = {
     string: {
         type: String,
-        setter: function (value) {
+        setter: function (value, is_default) {
+            if ( is_default && value === undefined) {
+                return '';
+            }
+
             // If is normal string, strip html tags to prevent XSS attack
             return String(value).replace(/<[^>]+>/g, '');
         }
