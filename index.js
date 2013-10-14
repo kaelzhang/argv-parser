@@ -331,7 +331,7 @@ var TYPES = {
             if ( is_default && value === undefined ) {
                 return value;
             } else {
-                return node_path.resolve(value);
+                return node_path.resolve(String(value));
             }
         }
     }
