@@ -1,4 +1,6 @@
+[![NPM version](https://badge.fury.io/js/clean.png)](http://badge.fury.io/js/clean)
 [![Build Status](https://travis-ci.org/kaelzhang/node-clean.png?branch=master)](https://travis-ci.org/kaelzhang/node-clean)
+[![Dependency Status](https://gemnasium.com/kaelzhang/node-clean.png)](https://gemnasium.com/kaelzhang/node-clean)
 
 # clean
 
