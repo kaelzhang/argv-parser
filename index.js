@@ -339,7 +339,10 @@ var TYPES = {
                     }
                 });
             }
+
+            done(null);
         },
+
         setter: function (value, is_default) {
 
             // we should not convert `undefined` to some path like `/Users/xxx/undefined`
