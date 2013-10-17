@@ -307,7 +307,8 @@ var TYPES = {
                     code: 'ETYPE',
                     message: '"' + value + '" is not a valid url.',
                     data: {
-                        value: value
+                        value: value,
+                        expect: 'url' 
                     }
                 });
             } else {
@@ -325,6 +326,20 @@ var TYPES = {
 
     path: {
         type: node_path,
+        validator: function (value, is_default) {
+            var done = this.async();
+
+            if ( !is_default && typeof value !== 'string' ) {
+                done({
+                    code: 'ETYPE',
+                    message: '`' + value + '` is not a valid path.',
+                    data: {
+                        value: value,
+                        expect: 'path'
+                    }
+                });
+            }
+        },
         setter: function (value, is_default) {
 
             // we should not convert `undefined` to some path like `/Users/xxx/undefined`
