@@ -296,8 +296,12 @@ var TYPES = {
 
     url: {
         type: node_url,
-        setter: function (value) {
+        setter: function (value, is_default) {
             var done = this.async();
+
+            if ( is_default && value === undefined ) {
+                return done(null, value);
+            }
 
             // if the parameter is not string, an error occurs
             var url = node_url.parse(String(value));
@@ -311,6 +315,7 @@ var TYPES = {
                         expect: 'url' 
                     }
                 });
+
             } else {
                 done(null, url.href);
             }
@@ -330,7 +335,7 @@ var TYPES = {
             var done = this.async();
 
             if ( !is_default && typeof value !== 'string' ) {
-                done({
+                return done({
                     code: 'ETYPE',
                     message: '`' + value + '` is not a valid path.',
                     data: {
@@ -338,9 +343,10 @@ var TYPES = {
                         expect: 'path'
                     }
                 });
+            
+            } else {
+                done(null);
             }
-
-            done(null);
         },
 
         setter: function (value, is_default) {
