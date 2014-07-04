@@ -39,7 +39,7 @@ function Clean(options) {
   this._types = {};
 
   this._parseSchema();
-  this._parseShorthands();
+  // this._parseShorthands();
   this.checker = checker(this._schema, this.options);
 }
 
@@ -58,10 +58,24 @@ Clean.prototype.parse = function(argv, callback) {
 
 
 Clean.prototype.argv = function(argv) {
-  var data = minimist(argv.slice(this.options.offset));
-  this._applyShorthands(data);
-
+  var minimist_options = this._parseArgvOptions();
+  var data = minimist(argv.slice(this.options.offset), minimist_options);
   return data;
+};
+
+
+Clean.prototype._parseArgvOptions = function() {
+  var o = {
+    string: [],
+    boolean: [],
+    alias: this.options.shorthands
+  };
+  util.map(this._schema, function (rule, name) {
+    if (rule.type === Boolean) {
+      o.boolean.push(name);
+    }
+  });
+  return o;
 };
 
 
@@ -92,7 +106,6 @@ Clean.prototype.registerType = function(type, schema) {
 // }
 Clean.prototype._parseSchema = function() {
   var schema = checker.parseSchema(this.options.schema);
-
   util.map(schema, function(rule, name) {
 
     if (rule.required) {
@@ -117,19 +130,19 @@ Clean.prototype._parseSchema = function() {
 };
 
 
-Clean.prototype._parseShorthands = function() {
-  var shorthands = {};
+// Clean.prototype._parseShorthands = function() {
+//   var shorthands = {};
 
-  util.map(this.options.shorthands || {}, function(def, shorthand) {
-    shorthands[shorthand] = typeof def === 'string' ?
-      def :
-      Object(def) === def ?
-      def :
-      minimist(def);
-  });
+//   util.map(this.options.shorthands || {}, function(def, shorthand) {
+//     shorthands[shorthand] = typeof def === 'string' ?
+//       def :
+//       Object(def) === def ?
+//       def :
+//       minimist(def);
+//   });
 
-  this._shorthands = shorthands;
-};
+//   this._shorthands = shorthands;
+// };
 
 
 Clean.prototype._getTypeDef = function(type) {
@@ -155,29 +168,29 @@ Clean.prototype._getTypeDef = function(type) {
 };
 
 
-Clean.prototype._applyShorthands = function(data) {
-  util.map(this._shorthands, function(def, shorthand) {
-    if (shorthand in data) {
-      var origin_value = data[shorthand];
-      delete data[shorthand];
+// Clean.prototype._applyShorthands = function(data) {
+//   util.map(this._shorthands, function(def, shorthand) {
+//     if (shorthand in data) {
+//       var origin_value = data[shorthand];
+//       delete data[shorthand];
 
-      // shorthands: { c: 'cwd' }
-      // data: { c: 'abc' } -> { cwd: 'abc' }
-      if (typeof def === 'string') {
+//       // shorthands: { c: 'cwd' }
+//       // data: { c: 'abc' } -> { cwd: 'abc' }
+//       if (typeof def === 'string') {
 
-        if (shorthand) {
+//         if (shorthand) {
 
-        }
-        data[def] = origin_value;
+//         }
+//         data[def] = origin_value;
 
-        // shorthands: { r3: { retry: 3, strict: false } }
-        // data: { r3: true } -> { retry, 3, strict: false }
-      } else {
-        util.mix(data, def);
-      }
-    }
-  });
-};
+//         // shorthands: { r3: { retry: 3, strict: false } }
+//         // data: { r3: true } -> { retry, 3, strict: false }
+//       } else {
+//         util.mix(data, def);
+//       }
+//     }
+//   });
+// };
 
 
 function required_validator(value, is_default) {

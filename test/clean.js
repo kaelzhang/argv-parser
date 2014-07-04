@@ -32,12 +32,38 @@ describe(".parse()", function() {
       schema: schema,
       shorthands: shorthands
 
-    }).parseArgv(['node', 'my command', '-c', 'abc', '-a', '--url', 'abc'], function(err, results, details) {
+    }).parse(['node', 'my command', '-c', 'abc', '-a', '--url', 'abc'], function(err, results, details) {
       done();
       expect(err).not.to.equal(null);
       expect(results.cwd).to.equal(node_path.resolve('abc'));
       expect(details.url.error).not.to.equal(null);
     });
+  });
+});
+
+
+describe(".argv(argv)", function(){
+  it("#12: boolean type", function(){
+    var data = clean({
+      schema: {
+        boolean: {
+          type: Boolean
+        },
+        blah: {
+          type: Boolean
+        },
+        boo: {
+
+        }
+      },
+      shorthands: {
+        'g': 'blah'
+      }
+    }).argv('node xxxx --boolean abc -g ccc --boo a'.split(' '));
+    expect(data.boolean).to.equal(true);
+    expect(data.blah).to.equal(true);
+    expect(data.boo).to.equal('a');
+    expect(data._).to.deep.equal(['abc', 'ccc']);
   });
 });
 
