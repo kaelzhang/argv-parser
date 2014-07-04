@@ -1,8 +1,4 @@
-[![NPM version](https://badge.fury.io/js/clean.png)](http://badge.fury.io/js/clean)
-[![Build Status](https://travis-ci.org/kaelzhang/node-clean.png?branch=master)](https://travis-ci.org/kaelzhang/node-clean)
-[![Dependency Status](https://gemnasium.com/kaelzhang/node-clean.png)](https://gemnasium.com/kaelzhang/node-clean)
-
-# clean
+# clean [![NPM version](https://badge.fury.io/js/clean.png)](http://badge.fury.io/js/clean) [![Build Status](https://travis-ci.org/kaelzhang/node-clean.png?branch=master)](https://travis-ci.org/kaelzhang/node-clean) [![Dependency Status](https://gemnasium.com/kaelzhang/node-clean.png)](https://gemnasium.com/kaelzhang/node-clean)
 
 Clean is small but powerful node.js module that parses and santitize argv or options for node, supporting:
 
@@ -63,7 +59,7 @@ clean({
 		
 		retry: {
 			type: Boolean
-		}		
+		}
 	}
 }).parseArgv(
 	['node', 'xxx', '--cwd', 'abc', 'retry', 'false'], 
@@ -71,7 +67,7 @@ clean({
 		console.log(results.cwd); // the `path.resolved()`d 'abc'
 		console.log(results.retry === false); // is a boolean, not a string
 	}
-)
+);
 ```
 
 How to extend a custom type ? See the "advanced section".
@@ -87,58 +83,34 @@ node example/clean.js --username guest
 ```
 
 
-
 # Programatical Details
 
-## constructor: clean(schema, options)
+## constructor: clean(options)
 
-
-### options
-
-#### options.offset `Number=`
-
-The offset from which the parser should start to parse. Optional. Default to `2`.
-
-#### options.shorthands `Object=`
-
-The shorthands used to parse the argv.
-
-#### options.schema `Object=`
-
-The schema used to clean the given object or the parsred argv
-
-#### options.check_all `Boolean=false`
-
-#### options.parallel `Boolean=false`
-
-#### options.limit `Boolean=false`
-
+- options `Object=`
+  - schema `Object` schema to define the argv
+  - offset `Number=` The offset from which the parser should start to parse. Optional. Default to `2`.
+  - shorthands `Object=` The schema used to clean the given object or the parsred argv
+  - parallel `Boolean=false` whether should check the argv in parallel, default to `false`
 
 ## .argv(argv)
 
+- argv `Array` `process.argv` or something like that.
+
 Parses the argument vector, without cleaning the data.
 
-### argv `Array`
-
-### returns `Object`
-
-The parsed object with shorthand rules applied.
-
+Returns `Object` The parsed object with shorthand rules applied.
 
 ## .clean(data, callback)
 
+- data `Object` The given data.
+- callback `function(err, results)`
+
 Cleans the given data according to the `schema`.
 
-### data `Object`
+## .parse(argv, callback)
 
-The given data.
-
-### callback `function(err, results, details)`
-
-
-## .parseArgv(argv, callback)
-
-Parses argument vector (argv) or something like argv, and cleans the parsed data according to the `schema`.
+Parses argument vector (argv) or something like `process.argv`, and cleans the parsed data according to the `schema`.
 
 This method is equivalent to `c.clean(c.argv(argv), callback)`.
 
@@ -146,8 +118,5 @@ This method is equivalent to `c.clean(c.argv(argv), callback)`.
 
 ## .registerType(type, typeDef)
 
-
-
-
-
+Registers a custom type.
 
