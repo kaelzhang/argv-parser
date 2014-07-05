@@ -1,6 +1,6 @@
 {
   "name": "clean",
-  "version": "3.0.1",
+  "version": "3.0.2",
   "description": "clean parses and santitize argv or options for node, supporting fully extendable types, shorthands, validatiors and setters.",
   "main": "index.js",
   "scripts": {
