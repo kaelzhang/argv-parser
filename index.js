@@ -39,9 +39,19 @@ function Clean(options) {
   this._types = {};
 
   this._parseSchema();
-  // this._parseShorthands();
+  this._reverseShorthands();
   this.checker = checker(this._schema, this.options);
 }
+
+
+Clean.prototype._reverseShorthands = function() {
+  var reversed = this._reversed = {};
+  if (this.options.shorthands) {
+    util.map(this.options.shorthands, function (arg, shorthand) {
+      reversed[arg] = shorthand;
+    });
+  }
+};
 
 
 //  0       1           2          3
@@ -52,14 +62,21 @@ clean.PARSE_ARGV_OFFSET = 2;
 // parse and clean
 Clean.prototype.parse = function(argv, callback) {
   var data = this.argv(argv);
-
   this.clean(data, callback);
 };
 
 
 Clean.prototype.argv = function(argv) {
   var minimist_options = this._parseArgvOptions();
-  var data = minimist(argv.slice(this.options.offset), minimist_options);
+  var sliced = argv.slice(this.options.offset);
+  var data = minimist(sliced, minimist_options);
+
+  // #13
+  // We should clean the data, that we should stay the data clean and untouched.
+  // If user have not define the argument in argv,
+  // `data` object should not contain the argument key.
+  this._cleanMinimist(data, sliced);
+
   return data;
 };
 
@@ -89,6 +106,34 @@ Clean.prototype.registerType = function(type, schema) {
 };
 
 
+Clean.prototype._cleanMinimist = function(data, argv) {
+  Object.keys(data).forEach(function (key) {
+    // We should not delete `'_'`
+    if (key === '_') {
+      return;
+    }
+
+    if (!this._argvExists(key, argv)) {
+      delete data[key];
+    }
+  }.bind(this));
+};
+
+
+var REGEX_IS_SHORT = /^-[a-z0-9]+/i;
+Clean.prototype._argvExists = function(key, argv) {
+  var shorthand = this._reversed[key];
+  return argv.some(function (arg) {
+    if (REGEX_IS_SHORT.test(arg)) {
+      arg = arg.slice(1);
+      return shorthand && ~arg.indexOf(shorthand);
+    }
+
+    return arg === '--' + key;
+  });
+};
+
+
 // schema
 // <key>: {
 
@@ -107,13 +152,11 @@ Clean.prototype.registerType = function(type, schema) {
 Clean.prototype._parseSchema = function() {
   var schema = checker.parseSchema(this.options.schema);
   util.map(schema, function(rule, name) {
-
     if (rule.required) {
       rule.validator.unshift(required_validator);
     }
 
     var type = rule.type;
-
     var type_def = this._getTypeDef(type);
 
     if (type_def.validator) {
@@ -128,21 +171,6 @@ Clean.prototype._parseSchema = function() {
 
   this._schema = schema;
 };
-
-
-// Clean.prototype._parseShorthands = function() {
-//   var shorthands = {};
-
-//   util.map(this.options.shorthands || {}, function(def, shorthand) {
-//     shorthands[shorthand] = typeof def === 'string' ?
-//       def :
-//       Object(def) === def ?
-//       def :
-//       minimist(def);
-//   });
-
-//   this._shorthands = shorthands;
-// };
 
 
 Clean.prototype._getTypeDef = function(type) {
@@ -166,31 +194,6 @@ Clean.prototype._getTypeDef = function(type) {
 
   return {};
 };
-
-
-// Clean.prototype._applyShorthands = function(data) {
-//   util.map(this._shorthands, function(def, shorthand) {
-//     if (shorthand in data) {
-//       var origin_value = data[shorthand];
-//       delete data[shorthand];
-
-//       // shorthands: { c: 'cwd' }
-//       // data: { c: 'abc' } -> { cwd: 'abc' }
-//       if (typeof def === 'string') {
-
-//         if (shorthand) {
-
-//         }
-//         data[def] = origin_value;
-
-//         // shorthands: { r3: { retry: 3, strict: false } }
-//         // data: { r3: true } -> { retry, 3, strict: false }
-//       } else {
-//         util.mix(data, def);
-//       }
-//     }
-//   });
-// };
 
 
 function required_validator(value, is_default) {
@@ -322,7 +325,6 @@ var TYPES = {
     type: node_path,
     validator: function(value, is_default) {
       var done = this.async();
-
       if (!is_default && typeof value !== 'string') {
         return done({
           code: 'ETYPE',
@@ -332,14 +334,12 @@ var TYPES = {
             expect: 'path'
           }
         });
-
       } else {
         done(null);
       }
     },
 
     setter: function(value, is_default) {
-
       // we should not convert `undefined` to some path like `/Users/xxx/undefined`
       if (is_default && value === undefined) {
         return value;
