@@ -66,6 +66,35 @@ describe(".parse()", function() {
       expect(details.url.error).not.to.equal(null);
     });
   });
+
+  it("#13, negative default", function(done){
+    var schema = {
+      cwd: {
+        type: node_path
+      },
+
+      a: {
+        type: Boolean,
+        default: true
+      },
+
+      url: {
+        type: node_url
+      }
+    };
+
+    clean({
+      schema: schema,
+      shorthands: shorthands
+
+    }).parse(['node', 'my command', '-c', 'abc', '--url', 'abc', '--no-a'], function(err, results, details) {
+      done();
+      expect(err).not.to.equal(null);
+      expect(results.cwd).to.equal(node_path.resolve('abc'));
+      expect(results.a).to.equal(false);
+      expect(details.url.error).not.to.equal(null);
+    });
+  });
 });
 
 
