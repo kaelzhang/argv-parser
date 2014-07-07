@@ -129,7 +129,10 @@ Clean.prototype._argvExists = function(key, argv) {
       return shorthand && ~arg.indexOf(shorthand);
     }
 
-    return arg === '--' + key;
+    var negative_key = '--no-' + key;
+
+    return arg === '--' + key
+      || arg === negative_key;
   });
 };
 
