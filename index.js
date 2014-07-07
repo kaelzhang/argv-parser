@@ -122,15 +122,22 @@ Clean.prototype._cleanMinimist = function(data, argv) {
 
 var REGEX_IS_SHORT = /^-[a-z0-9]+/i;
 Clean.prototype._argvExists = function(key, argv) {
+
+  // 'cwd' -> 'c'
   var shorthand = this._reversed[key];
   return argv.some(function (arg) {
     if (REGEX_IS_SHORT.test(arg)) {
+      // '-c' -> 'c'
       arg = arg.slice(1);
+      // 'c' -> match
+      // 'cf' -> combined shorthands, match
       return shorthand && ~arg.indexOf(shorthand);
     }
 
+    // '--no-cwd'
     var negative_key = '--no-' + key;
 
+    // '--cwd'
     return arg === '--' + key
       || arg === negative_key;
   });
