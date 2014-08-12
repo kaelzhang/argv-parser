@@ -59,13 +59,14 @@ Clean.prototype._reverseShorthands = function() {
 clean.PARSE_ARGV_OFFSET = 2;
 
 
-// parse and clean
+// Parse and clean
 Clean.prototype.parse = function(argv, callback) {
   var data = this.argv(argv);
   this.clean(data, callback);
 };
 
 
+// Gets the argv object without sanitizing
 Clean.prototype.argv = function(argv) {
   var minimist_options = this._parseArgvOptions();
   var sliced = argv.slice(this.options.offset);
@@ -106,6 +107,15 @@ Clean.prototype.registerType = function(type, schema) {
 };
 
 
+// ```pseudo javascript
+// If options.boolean: ['flag']
+// minimist('--abc') -> 
+// {
+//   flag: false,
+//   abc: true
+// }
+// Then, we can not figure out whether user define `flag` explicitly or just use the default value
+// So, clean the result of minimist.
 Clean.prototype._cleanMinimist = function(data, argv) {
   Object.keys(data).forEach(function (key) {
     // We should not delete `'_'`
