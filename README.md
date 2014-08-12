@@ -1,6 +1,6 @@
 # clean [![NPM version](https://badge.fury.io/js/clean.png)](http://badge.fury.io/js/clean) [![Build Status](https://travis-ci.org/kaelzhang/node-clean.png?branch=master)](https://travis-ci.org/kaelzhang/node-clean) [![Dependency Status](https://gemnasium.com/kaelzhang/node-clean.png)](https://gemnasium.com/kaelzhang/node-clean)
 
-Clean is small but powerful node.js module that parses and santitize argv or options for node, supporting:
+Clean is small but powerful node.js module that parses and santitize argv for node, supporting:
 
 - fully extendable types
 - shorthands

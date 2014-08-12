@@ -4,7 +4,7 @@ module.exports = clean;
 clean.Clean = Clean;
 
 var minimist = require('minimist');
-var checker = require('checker');
+var skema = require('skema');
 var util = checker.util;
 
 var node_path = require('path');
