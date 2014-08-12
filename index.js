@@ -28,7 +28,6 @@ function Clean(options) {
     options.offset = clean.PARSE_ARGV_OFFSET;
   }
 
-  this._types = {};
   this.schema = options.schema || {};
   this.keys = Object.keys(this.schema);
 
@@ -143,11 +142,6 @@ Clean.prototype.clean = function(object, callback) {
 
     callback(null, cleaned);
   });
-};
-
-
-Clean.prototype.registerType = function(type, schema) {
-  this._types[type] = schema;
 };
 
 
