@@ -25,6 +25,7 @@
   },
   "dependencies": {
     "minimist": "^1.1.0",
+    "mix2": "^0.1.6",
     "skema": "^1.0.0"
   },
   "devDependencies": {

@@ -5,6 +5,7 @@ clean.Clean = Clean;
 
 var minimist = require('minimist');
 var cleaner = require('./lib/cleaner');
+var mix = require('mix2');
 
 
 function clean(options) {
@@ -28,6 +29,8 @@ function Clean(options) {
   }
 
   this._types = {};
+  this.schema = options.schema || {};
+  this.keys = Object.keys(this.schema);
 
   this._reverseShorthands();
 }
@@ -35,7 +38,7 @@ function Clean(options) {
 
 // @returns {object|undefined}
 Clean.prototype._get_cleaner = function(key, context) {
-  var rule = this.options.schema && this.options.schema[key];
+  var rule = this.schema[key];
   if (!rule) {
     return;
   }
@@ -98,6 +101,48 @@ Clean.prototype._parseArgvOptions = function() {
 
 
 Clean.prototype.clean = function(object, callback) {
+  var type = this.options.parallel
+    ? 'each'
+    : 'eachSeries';
+
+  var cleaned = {};
+  var context = {
+    set: function (key, value) {
+      object[key] = cleaned[key] = value;
+    },
+
+    get: function (key) {
+      if (key in cleaned) {
+        return cleaned[key];
+      }
+
+      return object[key];
+    }
+  };
+
+  var self = this;
+  async[type](this.keys, function (key, done) {
+    var cleaner = self._get_cleaner(key, context);
+    cleaner.clean(object[key], [!(key in object)], function (err, value) {
+      if (err) {
+        return done(err);
+      }
+
+      cleaned[key] = value;
+      done(null);
+    });
+
+  }, function (err) {
+    if (err) {
+      return callback(err);
+    }
+
+    if (!self.options.limit) {
+      mix(cleaned, object, false);
+    }
+
+    callback(null, cleaned);
+  });
 };
 
 
