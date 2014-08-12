@@ -1,5 +1,7 @@
 'use strict';
 
+return;
+
 var clean = require('../');
 var expect = require('chai').expect;
 
