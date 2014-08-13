@@ -104,6 +104,8 @@ Clean.prototype._parseArgvOptions = function() {
       o.boolean.push(name);
     }
   });
+
+  mix(o, this.options, false);
   return o;
 };
 

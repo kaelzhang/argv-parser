@@ -312,3 +312,41 @@ describe("options.context, feated with this.get() and this.set()", function(){
     });
   });
 });
+
+
+describe("shorthands", function(){
+  var shorthands = {
+    s: 'string',
+    b: 'boolean',
+    n: 'number'
+  };
+
+  function parse (argv) {
+    return clean({
+      schema: {
+        string: {
+          type: String
+        },
+        boolean: {
+          type: Boolean
+        },
+        number: {
+          type: Number
+        }
+      },
+      shorthands: shorthands
+    }).argv(argv.split(' '));
+  }
+
+  it("number type", function(){
+    expect(parse('node xxx -n 1').number).to.equal(1);
+  });
+
+  it("boolean type", function(){
+    expect(parse('node xxx -b').boolean).to.equal(true);
+  });
+
+  it("string type", function(){
+    expect(parse('node xxx -s abc').string).to.equal('abc');
+  });
+});

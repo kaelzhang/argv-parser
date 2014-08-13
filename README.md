@@ -14,10 +14,10 @@ npm install clean --save
 ```
 
 ```js
-var clean = require('clean')(options);
+var clean = require('clean');
 ```
 
-# Usage
+# Usage: clean(options)
 
 ## Argv Shorthands
 
@@ -25,26 +25,17 @@ We can define shorthands with the option `options.shorthands`.
 
 ```js
 var shorthands = {
-	// if `String`, define a shorthand for a key name
 	c: 'cwd',
-	// if `Array`, define a pattern slice of argv
-	nr: ['--no-recursive'],
-	// if `Object`, define a specific value
-	r3: {
-		retry: 3,
-		strict: false
-	}
+	n: 'no-recursive'
 };
+
 clean({
 	shorthands: shorthands
-}).argv(['node', 'xxx', '-c', 'abc', '--nr', '--r3']); 
-// notice that '-nr' will be considered as '-n -r'
+}).argv(['node', 'xxx', '-c', 'abc', '-n']);
 // The result is:
 // {
 //		cwd: 'abc',
-//		recursive: false,
-//		retry: 3,
-//		strict: false 
+//		recursive: false
 // }
 ```
 
@@ -61,16 +52,14 @@ clean({
 			type: Boolean
 		}
 	}
-}).parseArgv(
-	['node', 'xxx', '--cwd', 'abc', 'retry', 'false'], 
-	function(err, results, details){
+}).parse(
+	['node', 'xxx', '--cwd', 'abc', '--retry', 'false'], 
+	function(err, results){
 		console.log(results.cwd); // the `path.resolved()`d 'abc'
 		console.log(results.retry === false); // is a boolean, not a string
 	}
 );
 ```
-
-How to extend a custom type ? See the "advanced section".
 
 ## Validators and Setters
 
@@ -92,6 +81,34 @@ node example/clean.js --username guest
   - offset `Number=` The offset from which the parser should start to parse. Optional. Default to `2`.
   - shorthands `Object=` The schema used to clean the given object or the parsred argv
   - parallel `Boolean=false` whether should check the argv in parallel, default to `false`
+
+## options.schema
+
+```js
+name: {
+  // If `required == true` and `--name` is not specified in argv, there will be an error
+  required: true,
+  validate: function(value){
+    return /[a-z]/i.test(value);
+  },
+  set: function(value){
+    return value.replace(/^[a-z]/, function(m){
+      return m.toUpperCase();
+    });
+  }
+}
+```
+
+- required `Boolean` 
+- default `*` if `required` is `true`, this property will be ignored.
+- validate `function(v, is_default)|Array` function for validation, or array of functions
+- set `function(v, is_default)|Array` setter function, or array of functions.
+
+There are three methods available for `this` object of validator and setter.
+
+- `this.async()` returns function `done`, and turns the current validator or setter into an asynchronous method. We can also use `done` to define better error messages.
+- `this.get(key)` could fetch the value of other properties.
+- `this.set(key, value)` could set values of other properties.
 
 ## .argv(argv)
 
