@@ -133,7 +133,7 @@ Clean.prototype.clean = function(object, callback) {
     var cleaner = self._get_cleaner(key, context);
     cleaner.clean(object[key], [!(key in object)], function (err, value) {
       if (err) {
-        return done(err);
+        return done(mangle_error(err, key));
       }
 
       cleaned[key] = value;
@@ -152,6 +152,30 @@ Clean.prototype.clean = function(object, callback) {
     callback(null, cleaned);
   });
 };
+
+
+function mangle_error (error, key) {
+  var prefix = 'Invalid option: --' + key
+
+  // No error message, just `return false` in validator
+  if (error === true) {
+    return prefix;
+  }
+
+  if (typeof error === 'string') {
+    return prefix + ': ' + error;
+  }
+
+  if (error.message) {
+    error.message = prefix + ': ' + error.message;
+  }
+
+  if (error.stack) {
+    error.stack = prefix + ': ' + error.stack;
+  }
+
+  return error;
+}
 
 
 // ```pseudo javascript
