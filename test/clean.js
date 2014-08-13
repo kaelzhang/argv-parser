@@ -132,3 +132,85 @@ describe(".clean()", function() {
     });
   });
 });
+
+
+describe("options.parallel", function(){
+  function run (option, result, done) {
+    var flag;
+    clean({
+      parallel: option,
+      schema: {
+        a: {
+          set: function (v) {
+            var done = this.async();
+            setTimeout(function () {
+              expect(flag).to.equal(result);
+              done(null, v);
+            }, 100);
+          }
+        },
+        b: {
+          set: function (v) {
+            var done = this.async();
+            setTimeout(function () {
+              flag = true;
+              done(null, v);
+            }, 0);
+          }
+        }
+      }
+    }).clean({}, function (err) {
+      expect(err).to.equal(null);
+      done();
+    });
+  }
+
+  it("parallel: true", function(done){
+    run(true, true, done);
+  });
+
+  it("parallel: false", function(done){
+    run(false, undefined, done);
+  });
+
+  it("parallel, default", function(done){
+    run(undefined, undefined, done);
+  });
+});
+
+
+describe("option.limit", function(){
+  function run (limit, result, done) {
+    clean({
+      limit: limit,
+      schema: {
+        a: {},
+        b: {
+          set: function (v) {
+            return v + 1;
+          }
+        }
+      }
+    }).clean({
+      a: 1,
+      b: 2,
+      c: 3
+    }, function (err, r) {
+      expect(err).to.equal(null);
+      expect(r).to.deep.equal(result);
+      done();
+    });
+  }
+
+  it("limit: true", function(done){
+    run(true, {a: 1, b: 3}, done);
+  });
+
+  it("limit: false", function(done){
+    run(false, {a: 1, b: 3, c: 3}, done);
+  });
+
+  it("limit: default", function(done){
+    run(undefined, {a: 1, b: 3, c: 3}, done);
+  });
+});
