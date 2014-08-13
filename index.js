@@ -19,7 +19,7 @@ function clean(options) {
 // - offset: {Number} the offset of the argv at which we should begin to parse
 // - schema: {Object}
 // - shorthands: {Object}
-// - context: {Object} the context of the helper functions
+// X - context: {Object} the context of the helper functions
 // - parallel: {boolean=false} whether checker should check the properties in parallel, default to false
 // - limit: {boolean=false} limit to the schema
 function Clean(options) {

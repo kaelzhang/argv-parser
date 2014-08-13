@@ -214,3 +214,101 @@ describe("option.limit", function(){
     run(undefined, {a: 1, b: 3, c: 3}, done);
   });
 });
+
+
+describe("options.context, feated with this.get() and this.set()", function(){
+  it("could get cleaned data", function(done){
+    clean({
+      schema: {
+        a: {
+          set: function (v) {
+            return v + 100;
+          }
+        },
+        b: {
+          set: function (v) {
+            return this.get('a')
+          }
+        }
+      }
+
+    }).clean({
+      a: 1,
+      b: 2,
+      c: 3
+    }, function (err, results) {
+      expect(err).to.equal(null);
+      expect(results).to.deep.equal({
+        a: 101,
+        b: 101,
+        c: 3
+      });
+      done();
+    });
+  });
+
+  it("could get uncleaned data", function(done){
+    clean({
+      schema: {
+        a: {
+          set: function (v) {
+            return v + 100;
+          }
+        },
+        b: {
+          set: function (v) {
+            return this.get('a') + this.get('c');
+          }
+        }
+      }
+
+    }).clean({
+      a: 1,
+      b: 2,
+      c: 3
+    }, function (err, results) {
+      expect(err).to.equal(null);
+      expect(results).to.deep.equal({
+        a: 101,
+        b: 104,
+        c: 3
+      });
+      done();
+    });
+  });
+
+  it("could set data", function(done){
+    clean({
+      schema: {
+        a: {
+          set: function (v) {
+            return v + 100;
+          }
+        },
+        b: {
+          set: function (v) {
+            var c = this.get('c');
+            var a = this.get('a');
+
+            this.set('c', 1000);
+            this.set('a', 1001)
+            return a + c;
+          }
+        }
+      }
+
+    }).clean({
+      a: 1,
+      b: 2,
+      c: 3
+    }, function (err, results) {
+      expect(err).to.equal(null);
+      expect(results).to.deep.equal({
+        a: 1001,
+        b: 104,
+        c: 1000
+      });
+      done();
+    });
+  });
+});
