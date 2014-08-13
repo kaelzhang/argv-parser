@@ -4,8 +4,9 @@ module.exports = clean;
 clean.Clean = Clean;
 
 var minimist = require('minimist');
-var cleaner = require('./lib/cleaner');
+var Cleaner = require('./lib/cleaner');
 var mix = require('mix2');
+var async = require('async');
 
 
 function clean(options) {
@@ -34,6 +35,14 @@ function Clean(options) {
   this._reverseShorthands();
 }
 
+function map (map, interator, context) {
+  var key;
+
+  for (key in map) {
+    interator.call(context || null, map[key], key);
+  }
+};
+
 
 // @returns {object|undefined}
 Clean.prototype._get_cleaner = function(key, context) {
@@ -49,7 +58,7 @@ Clean.prototype._get_cleaner = function(key, context) {
 Clean.prototype._reverseShorthands = function() {
   var reversed = this._reversed = {};
   if (this.options.shorthands) {
-    util.map(this.options.shorthands, function (arg, shorthand) {
+    map(this.options.shorthands, function (arg, shorthand) {
       reversed[arg] = shorthand;
     });
   }
@@ -90,7 +99,7 @@ Clean.prototype._parseArgvOptions = function() {
     boolean: [],
     alias: this.options.shorthands
   };
-  util.map(this._schema, function (rule, name) {
+  map(this.schema, function (rule, name) {
     if (rule.type === Boolean) {
       o.boolean.push(name);
     }
