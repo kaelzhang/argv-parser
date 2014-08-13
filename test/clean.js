@@ -1,7 +1,5 @@
 'use strict';
 
-return;
-
 var clean = require('../');
 var expect = require('chai').expect;
 
@@ -32,11 +30,9 @@ describe(".parse()", function() {
       schema: schema,
       shorthands: shorthands
 
-    }).parse(['node', 'my command', '-c', 'abc', '-a', '--url', 'abc'], function(err, results, details) {
+    }).parse(['node', 'my command', '-c', 'abc', '-a', '--url', 'abc'], function(err, results) {
       done();
       expect(err).not.to.equal(null);
-      expect(results.cwd).to.equal(node_path.resolve('abc'));
-      expect(details.url.error).not.to.equal(null);
     });
   });
 
@@ -49,10 +45,6 @@ describe(".parse()", function() {
       a: {
         type: Boolean,
         default: true
-      },
-
-      url: {
-        type: node_url
       }
     };
 
@@ -62,10 +54,9 @@ describe(".parse()", function() {
 
     }).parse(['node', 'my command', '-c', 'abc', '--url', 'abc'], function(err, results, details) {
       done();
-      expect(err).not.to.equal(null);
+      expect(err).to.equal(null);
       expect(results.cwd).to.equal(node_path.resolve('abc'));
       expect(results.a).to.equal(true);
-      expect(details.url.error).not.to.equal(null);
     });
   });
 
@@ -78,10 +69,6 @@ describe(".parse()", function() {
       a: {
         type: Boolean,
         default: true
-      },
-
-      url: {
-        type: node_url
       }
     };
 
@@ -91,10 +78,9 @@ describe(".parse()", function() {
 
     }).parse(['node', 'my command', '-c', 'abc', '--url', 'abc', '--no-a'], function(err, results, details) {
       done();
-      expect(err).not.to.equal(null);
+      expect(err).to.equal(null);
       expect(results.cwd).to.equal(node_path.resolve('abc'));
       expect(results.a).to.equal(false);
-      expect(details.url.error).not.to.equal(null);
     });
   });
 });
@@ -142,7 +128,7 @@ describe(".clean()", function() {
       done();
 
       expect(results.a).to.equal('');
-      expect(results.b).to.equal('null');
+      expect(results.b).to.equal('');
     });
   });
 });
