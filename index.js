@@ -221,7 +221,10 @@ Clean.prototype._argvExists = function(key, argv) {
     var negative_key = '--no-' + key;
 
     // '--cwd'
-    return arg === '--' + key
+    // '--cwd=abc'
+    var regexp = new RegExp('^--' + key + '(=.*)?$');
+
+    return regexp.test(arg)
       || arg === negative_key;
   });
 };
