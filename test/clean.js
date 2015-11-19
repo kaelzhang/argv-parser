@@ -83,6 +83,18 @@ describe(".parse()", function() {
       expect(results.a).to.equal(false);
     });
   });
+
+  it("with equal sign", function(done){
+    clean().parse(['node', 'my command', '--abc=123', '--def=', '--no-g', '--no-h=789'], function(err, results, details) {
+      done();
+      expect(err).to.equal(null);
+      expect(results.abc).to.equal(123);
+      expect(results.def).to.equal('');
+      expect(results.g).to.equal(false);
+      expect(results.h).to.equal(undefined);
+      expect(results['no-h']).to.equal(789);
+    });
+  });
 });
 
 
